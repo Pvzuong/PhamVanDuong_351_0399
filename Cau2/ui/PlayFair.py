@@ -9,7 +9,12 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+import sys
 import os
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from PlayFair.playfair_cipher import PlayFairCipher
 os.environ['QT_QPA_PLATFORM_PLUGIN_PATH']="../platforms"
 
 class Ui_MainWindow(object):
@@ -57,8 +62,31 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
+
+        self.cipher = PlayFairCipher()
+
+        self.btn_encrypt.clicked.connect(self.encrypt)
+        self.btn_decrypt.clicked.connect(self.decrypt)
+
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
+    def encrypt(self):
+        key = self.txt_key.toPlainText().strip()
+        text = self.txt_doc.toPlainText().strip()
+
+        matrix = self.cipher.create_playfair_matrix(key)
+        result = self.cipher.playfair_encrypt(text, matrix)
+
+        self.txt_output.setPlainText(result)
+
+    def decrypt(self):
+        key = self.txt_key.toPlainText().strip()
+        text = self.txt_doc.toPlainText().strip()
+
+        matrix = self.cipher.create_playfair_matrix(key)
+        result = self.cipher.playfair_decrypt(text, matrix)
+
+        self.txt_output.setPlainText(result)
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
